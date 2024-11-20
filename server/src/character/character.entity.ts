@@ -68,4 +68,7 @@ export class Character {
 
   @ManyToOne(() => Visibility, { nullable: true })
   visibility: Visibility;
+
+  @ManyToOne(() => User, { nullable: true })
+  createdBy: User;
 }

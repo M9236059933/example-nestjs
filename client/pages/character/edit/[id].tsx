@@ -2,6 +2,7 @@ import { useState, useEffect, FormEvent } from "react";
 import { useRouter } from "next/router";
 import axiosInstance from "../../../utils/axios";
 import withAuth from "../../../hoc/withAuth";
+import { AxiosError } from "axios";
 
 interface World {
   id: number;
@@ -33,7 +34,35 @@ interface Visibility {
   desc: string;
 }
 
+interface Character {
+  id: number;
+  name: string;
+  nickname: string;
+  type: { desc: string };
+  world: { id: number; name: string };
+  class: { id: number; desc: string };
+  subclass: string;
+  secondClass: { id: number; desc: string };
+  secondSubclass: string;
+  species: { id: number; desc: string };
+  customSpecies: string;
+  subSpecies: string;
+  gender: { id: number; desc: string };
+  customGender: string;
+  hair: string;
+  eyes: string;
+  height: string;
+  appearance: string;
+  visibility: { id: number; desc: string };
+  createdBy: {
+    id: number;
+    username: string;
+    email: string;
+  };
+}
+
 const EditCharacter: React.FC = () => {
+  const [character, setCharacter] = useState<Character | null>(null);
   const [name, setName] = useState("");
   const [nickname, setNickname] = useState("");
   const [type, setType] = useState<number | null>(null);
@@ -86,25 +115,38 @@ const EditCharacter: React.FC = () => {
             axiosInstance.get("/visibility")
           ]);
 
-          const character = characterRes.data;
-          setName(character.name);
-          setNickname(character.nickname || "");
-          setType(character.type?.id || null);
-          setWorld(character.world?.id || null);
-          setClassType(character.class?.id || null);
-          setSubclass(character.subclass || "");
-          setSecondClass(character.secondClass?.id || null);
-          setSecondSubclass(character.secondSubclass || "");
-          setSpecies(character.species?.id || null);
-          setCustomSpecies(character.customSpecies || "");
-          setSubSpecies(character.subSpecies || "");
-          setGender(character.gender?.id || null);
-          setCustomGender(character.customGender || "");
-          setHair(character.hair || "");
-          setEyes(character.eyes || "");
-          setHeight(character.height || "");
-          setAppearance(character.appearance || "");
-          setVisibility(character.visibility?.id || null);
+          const characterData = characterRes.data;
+          setCharacter(characterData);
+          
+          // Check if current user is the creator
+          const token = localStorage.getItem('token');
+          if (token) {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            if (characterData.createdBy?.id !== payload.sub) {
+              alert("You don't have permission to edit this character");
+              router.push("/dashboard");
+              return;
+            }
+          }
+
+          setName(characterData.name);
+          setNickname(characterData.nickname || "");
+          setType(characterData.type?.id || null);
+          setWorld(characterData.world?.id || null);
+          setClassType(characterData.class?.id || null);
+          setSubclass(characterData.subclass || "");
+          setSecondClass(characterData.secondClass?.id || null);
+          setSecondSubclass(characterData.secondSubclass || "");
+          setSpecies(characterData.species?.id || null);
+          setCustomSpecies(characterData.customSpecies || "");
+          setSubSpecies(characterData.subSpecies || "");
+          setGender(characterData.gender?.id || null);
+          setCustomGender(characterData.customGender || "");
+          setHair(characterData.hair || "");
+          setEyes(characterData.eyes || "");
+          setHeight(characterData.height || "");
+          setAppearance(characterData.appearance || "");
+          setVisibility(characterData.visibility?.id || null);
 
           setWorldList(worldsRes.data);
           setCharTypeList(charTypesRes.data);
@@ -114,8 +156,14 @@ const EditCharacter: React.FC = () => {
           setVisibilityList(visibilitiesRes.data);
         }
       } catch (error) {
-        console.error("Failed to fetch data:", error);
-        router.push("/dashboard");
+        const axiosError = error as AxiosError;
+        if (axiosError.response?.status === 403) {
+          alert("You don't have permission to edit this character");
+          router.push("/dashboard");
+        } else {
+          console.error("Failed to fetch data:", axiosError);
+          router.push("/dashboard");
+        }
       }
     };
 
@@ -147,13 +195,30 @@ const EditCharacter: React.FC = () => {
       });
       router.push("/dashboard");
     } catch (error) {
-      console.error("Failed to update character:", error);
+      const axiosError = error as AxiosError;
+      if (axiosError.response?.status === 403) {
+        alert("You don't have permission to edit this character");
+      } else {
+        console.error("Failed to update character:", axiosError);
+      }
     }
   };
 
+  if (!character) {
+    return <div>Loading...</div>;
+  }
+
   return (
-    <div className="max-w-xl mx-auto p-8 bg-white shadow-md rounded">
-      <h1 className="text-2xl font-bold mb-6">Edit Character</h1>
+    <div className="max-w-4xl mx-auto p-8">
+      <h1 className="text-3xl font-bold mb-6">Edit Character</h1>
+      
+      <div className="mb-4">
+        <p className="text-gray-600">
+          <span className="font-semibold">Created By:</span>{" "}
+          {character.createdBy?.username || character.createdBy?.email || "N/A"}
+        </p>
+      </div>
+      
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Name */}
         <input

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Character } from './character.entity';
@@ -25,6 +25,8 @@ export class CharacterService {
         'species',
         'gender',
         'visibility',
+        'createdBy',
+        'owner',
       ],
     });
   }
@@ -39,8 +41,10 @@ export class CharacterService {
         'secondClass',
         'species',
         'gender',
-        'visibility'
-      ]
+        'visibility',
+        'createdBy',
+        'owner',
+      ],
     });
     if (!character) {
       throw new NotFoundException('Character not found');
@@ -48,12 +52,24 @@ export class CharacterService {
     return character;
   }
 
-  async update(id: number, updateData: Partial<Character>): Promise<Character> {
+  async update(id: number, userId: number, updateData: Partial<Character>): Promise<Character> {
+    const character = await this.findOne(id);
+    
+    if (character.createdBy?.id !== userId) {
+      throw new ForbiddenException('You do not have permission to edit this character');
+    }
+
     await this.characterRepository.update(id, updateData);
     return this.findOne(id);
   }
 
-  async delete(id: number): Promise<void> {
+  async delete(id: number, userId: number): Promise<void> {
+    const character = await this.findOne(id);
+    
+    if (character.createdBy?.id !== userId) {
+      throw new ForbiddenException('You do not have permission to delete this character');
+    }
+
     const result = await this.characterRepository.delete(id);
     if (result.affected === 0) {
       throw new NotFoundException('Character not found');

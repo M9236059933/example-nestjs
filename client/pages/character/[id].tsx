@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import axiosInstance from "../../utils/axios";
 import withAuth from "../../hoc/withAuth";
+import { AxiosError } from "axios";
 
 interface Character {
   id: number;
@@ -22,28 +23,57 @@ interface Character {
   height: string | null;
   appearance: string | null;
   visibility: { id: number; desc: string } | null;
+  createdBy: {
+    id: number;
+    username: string;
+    email: string;
+  };
 }
 
 const CharacterView: React.FC = () => {
   const [character, setCharacter] = useState<Character | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<number | null>(null);
   const router = useRouter();
   const { id } = router.query;
 
   useEffect(() => {
-    if (id) {
-      const fetchCharacter = async () => {
-        try {
+    const fetchData = async () => {
+      try {
+        // Get current user ID from JWT token
+        const token = localStorage.getItem('token');
+        if (token) {
+          const payload = JSON.parse(atob(token.split('.')[1]));
+          setCurrentUserId(payload.sub);
+        }
+
+        if (id) {
           const response = await axiosInstance.get(`/character/${id}`);
           setCharacter(response.data);
-        } catch (error) {
-          console.error("Failed to fetch character:", error);
-          router.push("/dashboard");
         }
-      };
+      } catch (error) {
+        console.error("Failed to fetch character:", error);
+        router.push("/dashboard");
+      }
+    };
 
-      fetchCharacter();
-    }
+    fetchData();
   }, [id, router]);
+
+  const handleDelete = async () => {
+    if (window.confirm("Are you sure you want to delete this character?")) {
+      try {
+        await axiosInstance.delete(`/character/${character?.id}`);
+        router.push("/dashboard");
+      } catch (error) {
+        const axiosError = error as AxiosError;
+        if (axiosError.response?.status === 403) {
+          alert("You don't have permission to delete this character");
+        } else {
+          console.error("Failed to delete character:", axiosError);
+        }
+      }
+    }
+  };
 
   if (!character) {
     return <div>Loading...</div>;
@@ -109,13 +139,36 @@ const CharacterView: React.FC = () => {
           <span className="font-semibold">Visibility:</span>{" "}
           {character.visibility?.desc || "N/A"}
         </p>
+        <p className="text-gray-600 mt-4">
+          <span className="font-semibold">Created By:</span>{" "}
+          {character.createdBy?.username || character.createdBy?.email || "N/A"}
+        </p>
       </div>
-      <button
-        onClick={() => router.push("/dashboard")}
-        className="mt-6 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-      >
-        Back to Characters
-      </button>
+      <div className="mt-6 flex space-x-4">
+        <button
+          onClick={() => router.push("/dashboard")}
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+        >
+          Back to Characters
+        </button>
+        
+        {character.createdBy?.id === currentUserId && (
+          <>
+            <button
+              onClick={() => router.push(`/character/edit/${character.id}`)}
+              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+            >
+              Edit Character
+            </button>
+            <button
+              onClick={handleDelete}
+              className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+            >
+              Delete Character
+            </button>
+          </>
+        )}
+      </div>
     </div>
   );
 };

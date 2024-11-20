@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import axiosInstance from "../../utils/axios";
 import withAuth from "../../hoc/withAuth";
+import { AxiosError } from "axios";
 
 interface Character {
   id: number;
@@ -12,15 +13,28 @@ interface Character {
   species: { id: number; desc: string } | null;
   customSpecies: string | null;
   visibility: { id: number; desc: string } | null;
+  createdBy: {
+    id: number;
+    username: string;
+    email: string;
+  };
 }
 
 const CharacterPage: React.FC = () => {
   const [characterList, setCharacterList] = useState<Character[]>([]);
+  const [currentUserId, setCurrentUserId] = useState<number | null>(null);
   const router = useRouter();
 
   useEffect(() => {
-    const fetchCharacters = async () => {
+    const fetchData = async () => {
       try {
+        // Get current user ID from JWT token
+        const token = localStorage.getItem('token');
+        if (token) {
+          const payload = JSON.parse(atob(token.split('.')[1]));
+          setCurrentUserId(payload.sub); // 'sub' contains userId in JWT
+        }
+
         const response = await axiosInstance.get("/character");
         setCharacterList(response.data);
       } catch (error) {
@@ -28,7 +42,7 @@ const CharacterPage: React.FC = () => {
       }
     };
 
-    fetchCharacters();
+    fetchData();
   }, []);
 
   const handleDelete = async (id: number) => {
@@ -37,7 +51,12 @@ const CharacterPage: React.FC = () => {
         await axiosInstance.delete(`/character/${id}`);
         setCharacterList(characterList.filter((char) => char.id !== id));
       } catch (error) {
-        console.error("Failed to delete character:", error);
+        const axiosError = error as AxiosError;
+        if (axiosError.response?.status === 403) {
+          alert("You don't have permission to delete this character");
+        } else {
+          console.error("Failed to delete character:", axiosError);
+        }
       }
     }
   };
@@ -64,6 +83,7 @@ const CharacterPage: React.FC = () => {
               <th className="border border-gray-300 p-3 text-left">Class</th>
               <th className="border border-gray-300 p-3 text-left">Species</th>
               <th className="border border-gray-300 p-3 text-left">Visibility</th>
+              <th className="border border-gray-300 p-3 text-left">Created By</th>
               <th className="border border-gray-300 p-3 text-left">Actions</th>
             </tr>
           </thead>
@@ -90,6 +110,9 @@ const CharacterPage: React.FC = () => {
                   {character.visibility?.desc || "N/A"}
                 </td>
                 <td className="border border-gray-300 p-3">
+                  {character.createdBy?.username || character.createdBy?.email || "N/A"}
+                </td>
+                <td className="border border-gray-300 p-3">
                   <div className="flex space-x-2">
                     <button
                       onClick={() => router.push(`/character/${character.id}`)}
@@ -97,18 +120,22 @@ const CharacterPage: React.FC = () => {
                     >
                       View
                     </button>
-                    <button
-                      onClick={() => router.push(`/character/edit/${character.id}`)}
-                      className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDelete(character.id)}
-                      className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
-                    >
-                      Delete
-                    </button>
+                    {character.createdBy?.id === currentUserId && (
+                      <>
+                        <button
+                          onClick={() => router.push(`/character/edit/${character.id}`)}
+                          className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDelete(character.id)}
+                          className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                        >
+                          Delete
+                        </button>
+                      </>
+                    )}
                   </div>
                 </td>
               </tr>

@@ -19,7 +19,7 @@ const EditWorld: React.FC = () => {
           setDescription(world.description);
         } catch (error) {
           console.error("Failed to fetch world:", error);
-          router.push("/world");
+          router.push("/dashboard");
         }
       };
 
@@ -34,7 +34,7 @@ const EditWorld: React.FC = () => {
         name,
         description,
       });
-      router.push("/world");
+      router.push("/dashboard");
     } catch (error) {
       console.error("Failed to update world:", error);
     }

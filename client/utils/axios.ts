@@ -2,7 +2,7 @@ import axios from "axios";
 
 // Create axios instance with base configuration
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:3001", // Update this to match your NestJS server port
+  baseURL: "/api/", // Update this to match your NestJS server port
 });
 
 // Add a request interceptor

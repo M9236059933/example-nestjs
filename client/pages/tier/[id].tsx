@@ -28,7 +28,7 @@ const TierView: React.FC = () => {
           setTier(response.data);
         } catch (error) {
           console.error("Failed to fetch tier:", error);
-          router.push("/tier");
+          router.push("/dashboard");
         }
       };
 
@@ -52,7 +52,7 @@ const TierView: React.FC = () => {
         </p>
       </div>
       <button
-        onClick={() => router.push("/tier")}
+        onClick={() => router.push("/dashboard")}
         className="mt-6 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
       >
         Back to Tiers

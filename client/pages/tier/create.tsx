@@ -36,7 +36,7 @@ const CreateTier: React.FC = () => {
         bonus: bonus || null,
         npc: npcId,
       });
-      router.push("/tier");
+      router.push("/dashboard");
     } catch (error) {
       console.error("Failed to create tier:", error);
     }

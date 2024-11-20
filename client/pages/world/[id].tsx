@@ -22,7 +22,7 @@ const WorldView: React.FC = () => {
           setWorld(response.data);
         } catch (error) {
           console.error("Failed to fetch world:", error);
-          router.push("/world");
+          router.push("/dashboard");
         }
       };
 
@@ -39,7 +39,7 @@ const WorldView: React.FC = () => {
       <h1 className="text-3xl font-bold mb-6">{world.name}</h1>
       <p className="text-gray-600 mb-6">{world.description}</p>
       <button
-        onClick={() => router.push("/world")}
+        onClick={() => router.push("/dashboard")}
         className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
       >
         Back to Worlds

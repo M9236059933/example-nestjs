@@ -115,7 +115,7 @@ const EditCharacter: React.FC = () => {
         }
       } catch (error) {
         console.error("Failed to fetch data:", error);
-        router.push("/character");
+        router.push("/dashboard");
       }
     };
 
@@ -145,7 +145,7 @@ const EditCharacter: React.FC = () => {
         appearance,
         visibility,
       });
-      router.push("/character");
+      router.push("/dashboard");
     } catch (error) {
       console.error("Failed to update character:", error);
     }

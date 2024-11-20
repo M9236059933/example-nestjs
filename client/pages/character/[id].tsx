@@ -37,7 +37,7 @@ const CharacterView: React.FC = () => {
           setCharacter(response.data);
         } catch (error) {
           console.error("Failed to fetch character:", error);
-          router.push("/character");
+          router.push("/dashboard");
         }
       };
 
@@ -111,7 +111,7 @@ const CharacterView: React.FC = () => {
         </p>
       </div>
       <button
-        onClick={() => router.push("/character")}
+        onClick={() => router.push("/dashboard")}
         className="mt-6 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
       >
         Back to Characters

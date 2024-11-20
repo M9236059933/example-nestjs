@@ -40,7 +40,7 @@ const RelationshipView: React.FC = () => {
           setRelationship(response.data);
         } catch (error) {
           console.error("Failed to fetch relationship:", error);
-          router.push("/relationship");
+          router.push("/dashboard");
         }
       };
 
@@ -78,7 +78,7 @@ const RelationshipView: React.FC = () => {
         </p>
       </div>
       <button
-        onClick={() => router.push("/relationship")}
+        onClick={() => router.push("/dashboard")}
         className="mt-6 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
       >
         Back to Relationships

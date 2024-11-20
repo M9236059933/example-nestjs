@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axiosInstance from "../../utils/axios";
 import { useRouter } from "next/router";
+import withAuth from "../../hoc/withAuth";
 
 interface World {
   id: number;
@@ -327,15 +328,24 @@ const CreateCharacter: React.FC = () => {
           ))}
         </select>
 
-        <button
-          type="submit"
-          className="w-full bg-blue-500 text-white font-bold py-2 px-4 rounded hover:bg-blue-700"
-        >
-          Create Character
-        </button>
+        <div className="flex gap-4">
+          <button
+            type="submit"
+            className="flex-1 bg-blue-500 text-white font-bold py-2 rounded shadow-md transition duration-300 hover:bg-blue-600 focus:ring-2 focus:ring-blue-300"
+          >
+            Create
+          </button>
+          <button
+            type="button"
+            onClick={() => router.push("/dashboard")}
+            className="flex-1 bg-gray-500 text-white font-bold py-2 rounded shadow-md transition duration-300 hover:bg-gray-600 focus:ring-2 focus:ring-gray-300"
+          >
+            Cancel
+          </button>
+        </div>
       </form>
     </div>
   );
 };
 
-export default CreateCharacter;
+export default withAuth(CreateCharacter);

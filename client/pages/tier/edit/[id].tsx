@@ -33,7 +33,7 @@ const EditTier: React.FC = () => {
         setCharacters(charactersResponse.data);
       } catch (error) {
         console.error("Failed to fetch data:", error);
-        router.push("/tier");
+        router.push("/dashboard");
       }
     };
 
@@ -48,7 +48,7 @@ const EditTier: React.FC = () => {
         bonus: bonus || null,
         npc: npcId,
       });
-      router.push("/tier");
+      router.push("/dashboard");
     } catch (error) {
       console.error("Failed to update tier:", error);
     }

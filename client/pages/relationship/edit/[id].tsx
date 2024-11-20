@@ -47,7 +47,7 @@ const EditRelationship: React.FC = () => {
           setPc(relationship.pc.id);
           setNpc(relationship.npc.id);
           setTier(relationship.tier?.id || null);
-          setVisibility(relationship.visibility.id);
+          setVisibility(relationship.visibility?.id || null);
 
           setCharacters(charactersRes.data);
           setTiers(tiersRes.data);
@@ -55,7 +55,7 @@ const EditRelationship: React.FC = () => {
         }
       } catch (error) {
         console.error("Failed to fetch data:", error);
-        router.push("/relationship");
+        router.push("/dashboard");
       }
     };
 
@@ -71,7 +71,7 @@ const EditRelationship: React.FC = () => {
         tier,
         visibility,
       });
-      router.push("/relationship");
+      router.push("/dashboard");
     } catch (error) {
       console.error("Failed to update relationship:", error);
     }

@@ -72,7 +72,7 @@ const RelationshipPage: React.FC = () => {
             <th className="border border-gray-300 p-3 text-left">NPC</th>
             <th className="border border-gray-300 p-3 text-left">Tier</th>
             <th className="border border-gray-300 p-3 text-left">Visibility</th>
-            <th className="border border-gray-300 p-3 text-left">Actions</th>
+            <th className="border border-gray-300 p-3 text-left w-[200px]">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -90,25 +90,27 @@ const RelationshipPage: React.FC = () => {
               <td className="border border-gray-300 p-3">
                 {relationship.visibility?.desc || "N/A"}
               </td>
-              <td className="border border-gray-300 p-3 space-x-2">
-                <button
-                  onClick={() => router.push(`/relationship/${relationship.id}`)}
-                  className="px-3 py-1 bg-green-500 text-white font-semibold rounded hover:bg-green-600 transition duration-300"
-                >
-                  View
-                </button>
-                <button
-                  onClick={() => router.push(`/relationship/edit/${relationship.id}`)}
-                  className="px-3 py-1 bg-yellow-500 text-white font-semibold rounded hover:bg-yellow-600 transition duration-300"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => handleDelete(relationship.id)}
-                  className="px-3 py-1 bg-red-500 text-white font-semibold rounded hover:bg-red-600 transition duration-300"
-                >
-                  Delete
-                </button>
+              <td className="border border-gray-300 p-3">
+                <div className="flex justify-between items-center gap-1 min-w-[180px]">
+                  <button
+                    onClick={() => router.push(`/relationship/${relationship.id}`)}
+                    className="px-2 py-1 bg-green-500 text-white font-semibold rounded hover:bg-green-600 transition duration-300 text-sm"
+                  >
+                    View
+                  </button>
+                  <button
+                    onClick={() => router.push(`/relationship/edit/${relationship.id}`)}
+                    className="px-2 py-1 bg-yellow-500 text-white font-semibold rounded hover:bg-yellow-600 transition duration-300 text-sm"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete(relationship.id)}
+                    className="px-2 py-1 bg-red-500 text-white font-semibold rounded hover:bg-red-600 transition duration-300 text-sm"
+                  >
+                    Delete
+                  </button>
+                </div>
               </td>
             </tr>
           ))}

@@ -59,7 +59,7 @@ const CreateRelationship: React.FC = () => {
         tier,
         visibility,
       });
-      router.push("/relationship");
+      router.push("/dashboard");
     } catch (error) {
       console.error("Failed to create relationship:", error);
     }

@@ -13,7 +13,6 @@ const CreateWorld: React.FC = () => {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     try {
-      // Get the user ID from the JWT token
       const token = localStorage.getItem("token");
       if (!token) {
         throw new Error("No token found");
@@ -26,7 +25,7 @@ const CreateWorld: React.FC = () => {
         name,
         description,
       });
-      router.push("/world");
+      router.push("/dashboard");
     } catch (error) {
       console.error("Failed to create world:", error);
     }
@@ -36,7 +35,6 @@ const CreateWorld: React.FC = () => {
     <div className="max-w-xl mx-auto p-8 bg-white shadow-md rounded">
       <h1 className="text-2xl font-bold mb-6">Create World</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Name */}
         <input
           type="text"
           placeholder="Name"
@@ -46,7 +44,6 @@ const CreateWorld: React.FC = () => {
           className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
 
-        {/* Description */}
         <textarea
           placeholder="Description"
           value={description}
@@ -54,13 +51,21 @@ const CreateWorld: React.FC = () => {
           className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
 
-        {/* Submit Button */}
-        <button
-          type="submit"
-          className="w-full bg-blue-500 text-white font-bold py-2 rounded shadow-md transition duration-300 hover:bg-blue-600 focus:ring-2 focus:ring-blue-300"
-        >
-          Create
-        </button>
+        <div className="flex gap-4">
+          <button
+            type="submit"
+            className="flex-1 bg-blue-500 text-white font-bold py-2 rounded shadow-md transition duration-300 hover:bg-blue-600 focus:ring-2 focus:ring-blue-300"
+          >
+            Create
+          </button>
+          <button
+            type="button"
+            onClick={() => router.push("/dashboard")}
+            className="flex-1 bg-gray-500 text-white font-bold py-2 rounded shadow-md transition duration-300 hover:bg-gray-600 focus:ring-2 focus:ring-gray-300"
+          >
+            Cancel
+          </button>
+        </div>
       </form>
     </div>
   );

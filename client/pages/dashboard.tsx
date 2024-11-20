@@ -5,6 +5,7 @@ import CharacterPage from "./character";
 import WorldPage from "./world";
 import TierPage from "./tier";
 import RelationshipPage from "./relationship";
+import ProfilePage from "./profile";
 
 const Dashboard: React.FC = () => {
   const router = useRouter();
@@ -30,6 +31,8 @@ const Dashboard: React.FC = () => {
 
   const renderContent = () => {
     switch (activeTab) {
+      case "Profile":
+        return <ProfilePage />;
       case "Worlds":
         return <WorldPage />;
       case "Tiers":
@@ -51,7 +54,7 @@ const Dashboard: React.FC = () => {
 
       {/* Tab buttons */}
       <div className="flex justify-center space-x-4 mb-6">
-        {["Worlds", "Tiers", "Characters", "Relationships"].map((tab) => (
+        {["Profile", "Worlds", "Tiers", "Characters", "Relationships"].map((tab) => (
           <button
             key={tab}
             onClick={() => handleTabChange(tab)}

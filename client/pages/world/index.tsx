@@ -1,6 +1,6 @@
 import withAuth from "../../hoc/withAuth";
 import { useState, useEffect } from "react";
-import axios from "axios";
+import axiosInstance from "../../utils/axios";
 import { useRouter } from "next/router";
 
 interface World {
@@ -14,21 +14,21 @@ const WorldPage: React.FC = () => {
   const router = useRouter();
 
   useEffect(() => {
+    const fetchWorlds = async () => {
+      try {
+        const response = await axiosInstance.get("/world");
+        setWorldList(response.data);
+      } catch (error) {
+        console.error("Failed to fetch worlds:", error);
+      }
+    };
+
     fetchWorlds();
   }, []);
 
-  const fetchWorlds = async () => {
-    try {
-      const response = await axios.get("/api/world");
-      setWorldList(response.data);
-    } catch (error) {
-      console.error("Failed to fetch Worlds:", error);
-    }
-  };
-
   const handleDelete = async (id: number) => {
     try {
-      await axios.delete(`/api/world/${id}`);
+      await axiosInstance.delete(`/world/${id}`);
       setWorldList(worldList.filter((world) => world.id !== id));
     } catch (error) {
       console.error("Failed to delete World:", error);

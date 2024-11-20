@@ -1,6 +1,6 @@
 import withAuth from "../../hoc/withAuth";
 import { useState, useEffect } from "react";
-import axios from "axios";
+import axiosInstance from "../../utils/axios";
 import { useRouter } from "next/router";
 
 interface Character {
@@ -20,21 +20,21 @@ const TierPage: React.FC = () => {
   const router = useRouter();
 
   useEffect(() => {
+    const fetchTiers = async () => {
+      try {
+        const response = await axiosInstance.get("/tier");
+        setTierList(response.data);
+      } catch (error) {
+        console.error("Failed to fetch tiers:", error);
+      }
+    };
+
     fetchTiers();
   }, []);
 
-  const fetchTiers = async () => {
-    try {
-      const response = await axios.get("/api/tier");
-      setTierList(response.data);
-    } catch (error) {
-      console.error("Failed to fetch Tiers:", error);
-    }
-  };
-
   const handleDelete = async (id: number) => {
     try {
-      await axios.delete(`/api/tier/${id}`);
+      await axiosInstance.delete(`/tier/${id}`);
       setTierList(tierList.filter((tier) => tier.id !== id));
     } catch (error) {
       console.error("Failed to delete Tier:", error);
@@ -56,7 +56,6 @@ const TierPage: React.FC = () => {
       <table className="w-full border-collapse">
         <thead>
           <tr className="bg-gray-200 text-gray-700">
-            <th className="border border-gray-300 p-3 text-left">ID</th>
             <th className="border border-gray-300 p-3 text-left">Level</th>
             <th className="border border-gray-300 p-3 text-left">Bonus</th>
             <th className="border border-gray-300 p-3 text-left">NPC</th>
@@ -66,13 +65,10 @@ const TierPage: React.FC = () => {
         <tbody>
           {tierList.map((tier) => (
             <tr key={tier.id} className="hover:bg-gray-100 transition">
-              <td className="border border-gray-300 p-3">{tier.id}</td>
               <td className="border border-gray-300 p-3">{tier.level}</td>
+              <td className="border border-gray-300 p-3">{tier.bonus || "N/A"}</td>
               <td className="border border-gray-300 p-3">
-                {tier.bonus || "No bonus"}
-              </td>
-              <td className="border border-gray-300 p-3">
-                {tier.npc ? tier.npc.name : "No NPC"}
+                {tier.npc?.name || "N/A"}
               </td>
               <td className="border border-gray-300 p-3 space-x-2">
                 <button

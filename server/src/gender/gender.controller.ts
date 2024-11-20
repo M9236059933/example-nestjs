@@ -7,13 +7,16 @@ import {
   Body,
   Param,
   NotFoundException,
+  UseGuards,
 } from '@nestjs/common';
 import { GenderService } from './gender.service';
 import { CreateGenderDto } from './create-gender.dto';
 import { UpdateGenderDto } from './update-gender.dto';
 import { Gender } from './gender.entity';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('gender')
+@UseGuards(JwtAuthGuard)
 export class GenderController {
   constructor(private readonly genderService: GenderService) {}
 

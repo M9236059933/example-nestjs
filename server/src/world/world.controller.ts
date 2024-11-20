@@ -7,6 +7,7 @@ import {
   Put,
   Delete,
   NotFoundException,
+  UseGuards,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -15,8 +16,10 @@ import { CreateWorldDto } from './create-world.dto';
 import { User } from '../user/user.entity';
 import { World } from './world.entity';
 import { UpdateWorldDto } from './update-world.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('world')
+@UseGuards(JwtAuthGuard)
 export class WorldController {
   constructor(
     private readonly worldService: WorldService,

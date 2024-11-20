@@ -6,13 +6,16 @@ import {
   Delete,
   Param,
   Body,
+  UseGuards,
 } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RelationshipService } from './relationship.service';
 import { CreateRelationshipDto } from './create-relationship.dto';
 import { UpdateRelationshipDto } from './update-relationship.dto';
 import { Relationship } from './relationship.entity';
 
 @Controller('relationship')
+@UseGuards(JwtAuthGuard)
 export class RelationshipController {
   constructor(private readonly relationshipService: RelationshipService) {}
 

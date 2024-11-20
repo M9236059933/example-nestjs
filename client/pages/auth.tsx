@@ -1,7 +1,8 @@
 import { useState, useEffect, FormEvent } from "react";
-import axios from "axios";
+import axiosInstance from "../utils/axios";
 import { jwtDecode } from "jwt-decode";
 import { useRouter } from "next/router";
+import { isAxiosError } from "axios";
 
 interface JwtPayload {
   sub: string;
@@ -26,7 +27,7 @@ export default function AuthPage() {
     const endpoint = isLogin ? "/auth/login" : "/auth/register";
 
     try {
-      const response = await axios.post(`/api${endpoint}`, {
+      const response = await axiosInstance.post(`${endpoint}`, {
         email,
         password,
       });
@@ -36,7 +37,7 @@ export default function AuthPage() {
         auth(response);
       }
     } catch (error) {
-      if (axios.isAxiosError(error)) {
+      if (isAxiosError(error)) {
         setError(
           error.response?.data.message || "An unexpected error occurred"
         );

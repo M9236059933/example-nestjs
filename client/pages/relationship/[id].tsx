@@ -1,83 +1,90 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import axios from "axios";
+import axiosInstance from "../../utils/axios";
+import withAuth from "../../hoc/withAuth";
 
 interface Character {
   id: number;
   name: string;
 }
 
-interface Relationship {
+interface Tier {
   id: number;
-  visibility: {
-    id: number;
-    desc: string;
-  } | null;
-  tier: {
-    id: number;
-    level: number;
-    bonus: string;
-  } | null;
-  npc: Character;
-  pc: Character;
+  level: number;
+  bonus: string | null;
 }
 
-const RelationshipDetails: React.FC = () => {
+interface Visibility {
+  id: number;
+  desc: string;
+}
+
+interface Relationship {
+  id: number;
+  pc: Character;
+  npc: Character;
+  tier: Tier | null;
+  visibility: Visibility;
+}
+
+const RelationshipView: React.FC = () => {
   const [relationship, setRelationship] = useState<Relationship | null>(null);
   const router = useRouter();
   const { id } = router.query;
 
   useEffect(() => {
     if (id) {
-      axios.get(`/api/relationship/${id}`).then((response) => {
-        setRelationship(response.data);
-      });
-    }
-  }, [id]);
+      const fetchRelationship = async () => {
+        try {
+          const response = await axiosInstance.get(`/relationship/${id}`);
+          setRelationship(response.data);
+        } catch (error) {
+          console.error("Failed to fetch relationship:", error);
+          router.push("/relationship");
+        }
+      };
 
-  if (!relationship) return <p>Loading...</p>;
+      fetchRelationship();
+    }
+  }, [id, router]);
+
+  if (!relationship) {
+    return <div>Loading...</div>;
+  }
 
   return (
-    <div className="max-w-2xl mx-auto p-8 bg-white shadow-md rounded">
-      <h1 className="text-3xl font-bold mb-4 text-blue-600">
-        Relationship Details
-      </h1>
-
-      <div className="space-y-3">
-        <p>
-          <span className="font-semibold text-gray-700">Visibility:</span>{" "}
-          {relationship.visibility?.desc || "Not set"}
+    <div className="max-w-2xl mx-auto p-8 bg-white shadow-lg rounded-lg">
+      <h1 className="text-3xl font-bold mb-6">Relationship Details</h1>
+      <div className="space-y-4">
+        <p className="text-gray-600">
+          <span className="font-semibold">PC:</span> {relationship.pc?.name || "N/A"}
         </p>
-        <p>
-          <span className="font-semibold text-gray-700">Tier:</span>{" "}
-          {relationship.tier ? `Level ${relationship.tier.level} - ${relationship.tier.bonus}` : "No Tier"}
+        <p className="text-gray-600">
+          <span className="font-semibold">NPC:</span> {relationship.npc?.name || "N/A"}
         </p>
-        <p>
-          <span className="font-semibold text-gray-700">NPC:</span>{" "}
-          {relationship.npc.name}
+        <p className="text-gray-600">
+          <span className="font-semibold">Tier:</span>{" "}
+          {relationship.tier ? `Level ${relationship.tier.level}` : "N/A"}
         </p>
-        <p>
-          <span className="font-semibold text-gray-700">PC:</span>{" "}
-          {relationship.pc.name}
+        {relationship.tier?.bonus && (
+          <p className="text-gray-600">
+            <span className="font-semibold">Tier Bonus:</span>{" "}
+            {relationship.tier.bonus}
+          </p>
+        )}
+        <p className="text-gray-600">
+          <span className="font-semibold">Visibility:</span>{" "}
+          {relationship.visibility?.desc || "N/A"}
         </p>
       </div>
-
-      <div className="mt-6 space-x-4">
-        <button
-          onClick={() => router.push(`/relationship/edit/${relationship.id}`)}
-          className="px-4 py-2 bg-blue-500 text-white font-bold rounded shadow-lg transition duration-300 hover:bg-blue-600 focus:ring-2 focus:ring-blue-300"
-        >
-          Edit
-        </button>
-        <button
-          onClick={() => router.push("/relationship")}
-          className="px-4 py-2 bg-gray-500 text-white font-bold rounded shadow-lg transition duration-300 hover:bg-gray-600 focus:ring-2 focus:ring-gray-300"
-        >
-          Back to List
-        </button>
-      </div>
+      <button
+        onClick={() => router.push("/relationship")}
+        className="mt-6 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+      >
+        Back to Relationships
+      </button>
     </div>
   );
 };
 
-export default RelationshipDetails;
+export default withAuth(RelationshipView);

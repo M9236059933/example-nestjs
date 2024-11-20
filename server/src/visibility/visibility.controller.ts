@@ -7,13 +7,16 @@ import {
   Body,
   Param,
   NotFoundException,
+  UseGuards,
 } from '@nestjs/common';
 import { VisibilityService } from './visibility.service';
 import { CreateVisibilityDto } from './create-visibility.dto';
 import { UpdateVisibilityDto } from './update-visibility.dto';
 import { Visibility } from './visibility.entity';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('visibility')
+@UseGuards(JwtAuthGuard)
 export class VisibilityController {
   constructor(private readonly visibilityService: VisibilityService) {}
 

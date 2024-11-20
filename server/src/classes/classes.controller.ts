@@ -7,13 +7,16 @@ import {
   Body,
   Param,
   NotFoundException,
+  UseGuards,
 } from '@nestjs/common';
 import { ClassesService } from './classes.service';
 import { CreateClassesDto } from './create-classes.dto';
 import { UpdateClassesDto } from './update-classes.dto';
 import { Classes } from './classes.entity';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('classes')
+@UseGuards(JwtAuthGuard)
 export class ClassesController {
   constructor(private readonly classesService: ClassesService) {}
 

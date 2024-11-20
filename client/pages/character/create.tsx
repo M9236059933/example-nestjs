@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import axiosInstance from "../../utils/axios";
 import { useRouter } from "next/router";
 
 interface World {
@@ -74,12 +74,12 @@ const CreateCharacter: React.FC = () => {
           gendersRes,
           visibilitiesRes
         ] = await Promise.all([
-          axios.get("/api/world"),
-          axios.get("/api/char-type"),
-          axios.get("/api/classes"),
-          axios.get("/api/species"),
-          axios.get("/api/gender"),
-          axios.get("/api/visibility")
+          axiosInstance.get("/world"),
+          axiosInstance.get("/char-type"),
+          axiosInstance.get("/classes"),
+          axiosInstance.get("/species"),
+          axiosInstance.get("/gender"),
+          axiosInstance.get("/visibility")
         ]);
 
         setWorldList(worldsRes.data);
@@ -99,7 +99,7 @@ const CreateCharacter: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await axios.post("/api/character", {
+      await axiosInstance.post("/character", {
         name,
         nickname,
         type,

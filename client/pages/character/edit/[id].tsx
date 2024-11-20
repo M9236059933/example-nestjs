@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
+import { useState, useEffect, FormEvent } from "react";
 import { useRouter } from "next/router";
+import axiosInstance from "../../../utils/axios";
+import withAuth from "../../../hoc/withAuth";
 
 interface World {
   id: number;
@@ -66,35 +67,26 @@ const EditCharacter: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch all dropdown data
-        const [
-          worldsRes,
-          charTypesRes,
-          classesRes,
-          speciesRes,
-          gendersRes,
-          visibilitiesRes
-        ] = await Promise.all([
-          axios.get("/api/world"),
-          axios.get("/api/char-type"),
-          axios.get("/api/classes"),
-          axios.get("/api/species"),
-          axios.get("/api/gender"),
-          axios.get("/api/visibility")
-        ]);
-
-        setWorldList(worldsRes.data);
-        setCharTypeList(charTypesRes.data);
-        setClassList(classesRes.data);
-        setSpeciesList(speciesRes.data);
-        setGenderList(gendersRes.data);
-        setVisibilityList(visibilitiesRes.data);
-
-        // Fetch character data if ID exists
         if (id) {
-          const characterRes = await axios.get(`/api/character/${id}`);
+          const [
+            characterRes,
+            worldsRes,
+            charTypesRes,
+            classesRes,
+            speciesRes,
+            gendersRes,
+            visibilitiesRes
+          ] = await Promise.all([
+            axiosInstance.get(`/character/${id}`),
+            axiosInstance.get("/world"),
+            axiosInstance.get("/char-type"),
+            axiosInstance.get("/classes"),
+            axiosInstance.get("/species"),
+            axiosInstance.get("/gender"),
+            axiosInstance.get("/visibility")
+          ]);
+
           const character = characterRes.data;
-          
           setName(character.name);
           setNickname(character.nickname || "");
           setType(character.type?.id || null);
@@ -113,19 +105,27 @@ const EditCharacter: React.FC = () => {
           setHeight(character.height || "");
           setAppearance(character.appearance || "");
           setVisibility(character.visibility?.id || null);
+
+          setWorldList(worldsRes.data);
+          setCharTypeList(charTypesRes.data);
+          setClassList(classesRes.data);
+          setSpeciesList(speciesRes.data);
+          setGenderList(gendersRes.data);
+          setVisibilityList(visibilitiesRes.data);
         }
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error("Failed to fetch data:", error);
+        router.push("/character");
       }
     };
 
     fetchData();
-  }, [id]);
+  }, [id, router]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     try {
-      await axios.put(`/api/character/${id}`, {
+      await axiosInstance.put(`/character/${id}`, {
         name,
         nickname,
         type,
@@ -145,9 +145,9 @@ const EditCharacter: React.FC = () => {
         appearance,
         visibility,
       });
-      router.push("/dashboard");
+      router.push("/character");
     } catch (error) {
-      console.error("Failed to update Character:", error);
+      console.error("Failed to update character:", error);
     }
   };
 
@@ -161,7 +161,8 @@ const EditCharacter: React.FC = () => {
           placeholder="Name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="w-full px-4 py-2 border rounded"
+          required
+          className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
 
         {/* Nickname */}
@@ -170,14 +171,14 @@ const EditCharacter: React.FC = () => {
           placeholder="Nickname"
           value={nickname}
           onChange={(e) => setNickname(e.target.value)}
-          className="w-full px-4 py-2 border rounded"
+          className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
 
         {/* Character Type */}
         <select
           value={type || ""}
           onChange={(e) => setType(e.target.value ? Number(e.target.value) : null)}
-          className="w-full px-4 py-2 border rounded"
+          className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
         >
           <option value="">Select Character Type</option>
           {charTypeList.map((charType) => (
@@ -191,7 +192,7 @@ const EditCharacter: React.FC = () => {
         <select
           value={world || ""}
           onChange={(e) => setWorld(e.target.value ? Number(e.target.value) : null)}
-          className="w-full px-4 py-2 border rounded"
+          className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
         >
           <option value="">Select World</option>
           {worldList.map((worldItem) => (
@@ -205,7 +206,7 @@ const EditCharacter: React.FC = () => {
         <select
           value={classType || ""}
           onChange={(e) => setClassType(e.target.value ? Number(e.target.value) : null)}
-          className="w-full px-4 py-2 border rounded"
+          className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
         >
           <option value="">Select Class</option>
           {classList.map((classItem) => (
@@ -221,14 +222,14 @@ const EditCharacter: React.FC = () => {
           placeholder="Subclass"
           value={subclass}
           onChange={(e) => setSubclass(e.target.value)}
-          className="w-full px-4 py-2 border rounded"
+          className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
 
         {/* Second Class */}
         <select
           value={secondClass || ""}
           onChange={(e) => setSecondClass(e.target.value ? Number(e.target.value) : null)}
-          className="w-full px-4 py-2 border rounded"
+          className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
         >
           <option value="">Select Second Class</option>
           {classList.map((classItem) => (
@@ -244,14 +245,14 @@ const EditCharacter: React.FC = () => {
           placeholder="Second Subclass"
           value={secondSubclass}
           onChange={(e) => setSecondSubclass(e.target.value)}
-          className="w-full px-4 py-2 border rounded"
+          className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
 
         {/* Species */}
         <select
           value={species || ""}
           onChange={(e) => setSpecies(e.target.value ? Number(e.target.value) : null)}
-          className="w-full px-4 py-2 border rounded"
+          className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
         >
           <option value="">Select Species</option>
           {speciesList.map((speciesItem) => (
@@ -268,7 +269,7 @@ const EditCharacter: React.FC = () => {
             placeholder="Custom Species"
             value={customSpecies}
             onChange={(e) => setCustomSpecies(e.target.value)}
-            className="w-full px-4 py-2 border rounded"
+            className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
         )}
 
@@ -278,14 +279,14 @@ const EditCharacter: React.FC = () => {
           placeholder="Subspecies"
           value={subSpecies}
           onChange={(e) => setSubSpecies(e.target.value)}
-          className="w-full px-4 py-2 border rounded"
+          className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
 
         {/* Gender */}
         <select
           value={gender || ""}
           onChange={(e) => setGender(e.target.value ? Number(e.target.value) : null)}
-          className="w-full px-4 py-2 border rounded"
+          className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
         >
           <option value="">Select Gender</option>
           {genderList.map((genderItem) => (
@@ -302,7 +303,7 @@ const EditCharacter: React.FC = () => {
             placeholder="Custom Gender"
             value={customGender}
             onChange={(e) => setCustomGender(e.target.value)}
-            className="w-full px-4 py-2 border rounded"
+            className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
         )}
 
@@ -312,7 +313,7 @@ const EditCharacter: React.FC = () => {
           placeholder="Hair"
           value={hair}
           onChange={(e) => setHair(e.target.value)}
-          className="w-full px-4 py-2 border rounded"
+          className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
 
         <input
@@ -320,7 +321,7 @@ const EditCharacter: React.FC = () => {
           placeholder="Eyes"
           value={eyes}
           onChange={(e) => setEyes(e.target.value)}
-          className="w-full px-4 py-2 border rounded"
+          className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
 
         <input
@@ -328,14 +329,14 @@ const EditCharacter: React.FC = () => {
           placeholder="Height"
           value={height}
           onChange={(e) => setHeight(e.target.value)}
-          className="w-full px-4 py-2 border rounded"
+          className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
 
         <textarea
           placeholder="Appearance"
           value={appearance}
           onChange={(e) => setAppearance(e.target.value)}
-          className="w-full px-4 py-2 border rounded"
+          className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
           rows={4}
         />
 
@@ -343,7 +344,7 @@ const EditCharacter: React.FC = () => {
         <select
           value={visibility || ""}
           onChange={(e) => setVisibility(e.target.value ? Number(e.target.value) : null)}
-          className="w-full px-4 py-2 border rounded"
+          className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
         >
           <option value="">Select Visibility</option>
           {visibilityList.map((visibilityItem) => (
@@ -355,7 +356,7 @@ const EditCharacter: React.FC = () => {
 
         <button
           type="submit"
-          className="w-full bg-blue-500 text-white font-bold py-2 px-4 rounded hover:bg-blue-700"
+          className="w-full bg-blue-500 text-white font-bold py-2 rounded shadow-md transition duration-300 hover:bg-blue-600 focus:ring-2 focus:ring-blue-300"
         >
           Update Character
         </button>
@@ -364,4 +365,4 @@ const EditCharacter: React.FC = () => {
   );
 };
 
-export default EditCharacter;
+export default withAuth(EditCharacter);

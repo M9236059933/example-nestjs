@@ -1,11 +1,16 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 
-const port = 3001;
-console.log(`Launching NestJS app on port ${port}, URL: http://0.0.0.0:${port}`);
-
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  await app.listen(port);
+  
+  app.enableCors({
+    origin: 'http://localhost:3000',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    allowedHeaders: 'Content-Type, Accept, Authorization',
+    credentials: true,
+  });
+  
+  await app.listen(3001);
 }
 bootstrap();

@@ -1,8 +1,9 @@
 import { useState, useEffect, FormEvent } from "react";
-import axios from "axios";
 import { useRouter } from "next/router";
+import axiosInstance from "../../../utils/axios";
+import withAuth from "../../../hoc/withAuth";
 
-interface NPC {
+interface Character {
   id: number;
   name: string;
 }
@@ -10,33 +11,46 @@ interface NPC {
 const EditTier: React.FC = () => {
   const [level, setLevel] = useState(0);
   const [bonus, setBonus] = useState("");
-  const [npc, setNpc] = useState<number | null>(null);
-  const [npcList, setNpcList] = useState<NPC[]>([]);
+  const [npcId, setNpcId] = useState<number | null>(null);
+  const [characters, setCharacters] = useState<Character[]>([]);
   const router = useRouter();
   const { id } = router.query;
 
   useEffect(() => {
-    if (id) {
-      axios.get(`/api/tier/${id}`).then((response) => {
-        const tier = response.data;
-        setLevel(tier.level);
-        setBonus(tier.bonus || "");
-        setNpc(tier.npc ? tier.npc.id : null);
-      });
-    }
+    const fetchData = async () => {
+      try {
+        // Fetch tier data
+        if (id) {
+          const tierResponse = await axiosInstance.get(`/tier/${id}`);
+          const tier = tierResponse.data;
+          setLevel(tier.level);
+          setBonus(tier.bonus || "");
+          setNpcId(tier.npc?.id || null);
+        }
 
-    axios.get("/api/character").then((response) => {
-      setNpcList(response.data);
-    });
-  }, [id]);
+        // Fetch characters for NPC selection
+        const charactersResponse = await axiosInstance.get("/character");
+        setCharacters(charactersResponse.data);
+      } catch (error) {
+        console.error("Failed to fetch data:", error);
+        router.push("/tier");
+      }
+    };
+
+    fetchData();
+  }, [id, router]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     try {
-      await axios.put(`/api/tier/${id}`, { level, bonus, npc });
-      router.push("/dashboard");
+      await axiosInstance.put(`/tier/${id}`, {
+        level,
+        bonus: bonus || null,
+        npc: npcId,
+      });
+      router.push("/tier");
     } catch (error) {
-      console.error("Failed to update Tier:", error);
+      console.error("Failed to update tier:", error);
     }
   };
 
@@ -44,7 +58,6 @@ const EditTier: React.FC = () => {
     <div className="max-w-xl mx-auto p-8 bg-white shadow-md rounded">
       <h1 className="text-2xl font-bold mb-6">Edit Tier</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Level */}
         <input
           type="number"
           placeholder="Level"
@@ -54,49 +67,36 @@ const EditTier: React.FC = () => {
           className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
 
-        {/* Bonus */}
-        <textarea
+        <input
+          type="text"
           placeholder="Bonus"
           value={bonus}
           onChange={(e) => setBonus(e.target.value)}
           className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
 
-        {/* NPC Dropdown */}
         <select
-          value={npc ?? ""}
-          onChange={(e) =>
-            setNpc(e.target.value ? Number(e.target.value) : null)
-          }
+          value={npcId || ""}
+          onChange={(e) => setNpcId(e.target.value ? Number(e.target.value) : null)}
           className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
         >
           <option value="">Select NPC</option>
-          {npcList.map((npcOption) => (
-            <option key={npcOption.id} value={npcOption.id}>
-              {npcOption.name}
+          {characters.map((character) => (
+            <option key={character.id} value={character.id}>
+              {character.name}
             </option>
           ))}
         </select>
 
-        {/* Submit Button */}
         <button
           type="submit"
           className="w-full bg-blue-500 text-white font-bold py-2 rounded shadow-md transition duration-300 hover:bg-blue-600 focus:ring-2 focus:ring-blue-300"
         >
           Update Tier
         </button>
-
-        {/* Back Button */}
-        <button
-          type="button"
-          onClick={() => router.push("/dashboard")}
-          className="w-full mt-3 bg-gray-500 text-white font-bold py-2 rounded shadow-md transition duration-300 hover:bg-gray-600 focus:ring-2 focus:ring-gray-300"
-        >
-          Cancel
-        </button>
       </form>
     </div>
   );
 };
 
-export default EditTier;
+export default withAuth(EditTier);

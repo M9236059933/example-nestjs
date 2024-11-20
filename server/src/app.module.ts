@@ -15,9 +15,13 @@ import { ClassesModule } from './classes/classes.module';
 import { CharTypeModule } from './char-type/char-type.module';
 import { DatabaseModule } from './database/database.module';
 import { DatabaseSeederService } from './database/seeds/database-seeder.service';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'ep-mute-paper-a46hw29p.us-east-1.pg.koyeb.app',

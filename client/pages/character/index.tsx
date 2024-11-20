@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import axios from "axios";
+import axiosInstance from "../../utils/axios";
+import withAuth from "../../hoc/withAuth";
 
 interface Character {
   id: number;
@@ -18,15 +19,22 @@ const CharacterPage: React.FC = () => {
   const router = useRouter();
 
   useEffect(() => {
-    axios.get("/api/character").then((response) => {
-      setCharacterList(response.data);
-    });
+    const fetchCharacters = async () => {
+      try {
+        const response = await axiosInstance.get("/character");
+        setCharacterList(response.data);
+      } catch (error) {
+        console.error("Failed to fetch characters:", error);
+      }
+    };
+
+    fetchCharacters();
   }, []);
 
   const handleDelete = async (id: number) => {
     if (window.confirm("Are you sure you want to delete this character?")) {
       try {
-        await axios.delete(`/api/character/${id}`);
+        await axiosInstance.delete(`/character/${id}`);
         setCharacterList(characterList.filter((char) => char.id !== id));
       } catch (error) {
         console.error("Failed to delete character:", error);
@@ -112,4 +120,4 @@ const CharacterPage: React.FC = () => {
   );
 };
 
-export default CharacterPage;
+export default withAuth(CharacterPage);

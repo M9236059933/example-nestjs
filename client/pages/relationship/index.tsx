@@ -1,6 +1,6 @@
 import withAuth from "../../hoc/withAuth";
 import { useState, useEffect } from "react";
-import axios from "axios";
+import axiosInstance from "../../utils/axios";
 import { useRouter } from "next/router";
 
 interface Character {
@@ -8,75 +8,112 @@ interface Character {
   name: string;
 }
 
+interface Tier {
+  id: number;
+  level: number;
+  bonus: string | null;
+}
+
+interface Visibility {
+  id: number;
+  desc: string;
+}
+
 interface Relationship {
   id: number;
-  visibility: {
-    id: number;
-    desc: string;
-  } | null;
-  tier: {
-    id: number;
-    level: number;
-    bonus: string;
-  } | null;
-  npc: Character;
   pc: Character;
+  npc: Character;
+  tier: Tier | null;
+  visibility: Visibility;
 }
 
 const RelationshipPage: React.FC = () => {
-  const [relationships, setRelationships] = useState<Relationship[]>([]);
+  const [relationshipList, setRelationshipList] = useState<Relationship[]>([]);
   const router = useRouter();
 
   useEffect(() => {
-    axios.get("/api/relationship").then((response) => {
-      setRelationships(response.data);
-    });
+    const fetchRelationships = async () => {
+      try {
+        const response = await axiosInstance.get("/relationship");
+        setRelationshipList(response.data);
+      } catch (error) {
+        console.error("Failed to fetch relationships:", error);
+      }
+    };
+
+    fetchRelationships();
   }, []);
 
-  return (
-    <div className="max-w-6xl mx-auto p-8">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">Relationships</h1>
-        <button
-          onClick={() => router.push("/relationship/create")}
-          className="px-4 py-2 bg-blue-500 text-white font-bold rounded shadow-lg transition duration-300 hover:bg-blue-600"
-        >
-          Create New
-        </button>
-      </div>
+  const handleDelete = async (id: number) => {
+    try {
+      await axiosInstance.delete(`/relationship/${id}`);
+      setRelationshipList(relationshipList.filter((rel) => rel.id !== id));
+    } catch (error) {
+      console.error("Failed to delete Relationship:", error);
+    }
+  };
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {relationships.map((relationship) => (
-          <div
-            key={relationship.id}
-            className="p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow"
-          >
-            <h2 className="text-xl font-semibold mb-2">
-              {relationship.npc.name} ↔ {relationship.pc.name}
-            </h2>
-            <p className="text-gray-600">
-              Visibility: {relationship.visibility?.desc || "Not set"}
-            </p>
-            <p className="text-gray-600">
-              Tier: {relationship.tier ? `Level ${relationship.tier.level}` : "None"}
-            </p>
-            <div className="mt-4 space-x-2">
-              <button
-                onClick={() => router.push(`/relationship/${relationship.id}`)}
-                className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
-              >
-                View
-              </button>
-              <button
-                onClick={() => router.push(`/relationship/edit/${relationship.id}`)}
-                className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600"
-              >
-                Edit
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
+  return (
+    <div className="p-8 max-w-4xl mx-auto bg-white shadow-lg rounded-lg">
+      <h1 className="text-2xl font-bold mb-6 text-center text-blue-600">
+        Relationship List
+      </h1>
+      <button
+        onClick={() => router.push("/relationship/create")}
+        className="mb-6 px-5 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md transition duration-300 hover:bg-blue-600 focus:ring-2 focus:ring-blue-300"
+      >
+        Create Relationship
+      </button>
+
+      <table className="w-full border-collapse">
+        <thead>
+          <tr className="bg-gray-200 text-gray-700">
+            <th className="border border-gray-300 p-3 text-left">PC</th>
+            <th className="border border-gray-300 p-3 text-left">NPC</th>
+            <th className="border border-gray-300 p-3 text-left">Tier</th>
+            <th className="border border-gray-300 p-3 text-left">Visibility</th>
+            <th className="border border-gray-300 p-3 text-left">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {relationshipList.map((relationship) => (
+            <tr key={relationship.id} className="hover:bg-gray-100 transition">
+              <td className="border border-gray-300 p-3">
+                {relationship.pc?.name || "N/A"}
+              </td>
+              <td className="border border-gray-300 p-3">
+                {relationship.npc?.name || "N/A"}
+              </td>
+              <td className="border border-gray-300 p-3">
+                {relationship.tier ? `Level ${relationship.tier.level}` : "N/A"}
+              </td>
+              <td className="border border-gray-300 p-3">
+                {relationship.visibility?.desc || "N/A"}
+              </td>
+              <td className="border border-gray-300 p-3 space-x-2">
+                <button
+                  onClick={() => router.push(`/relationship/${relationship.id}`)}
+                  className="px-3 py-1 bg-green-500 text-white font-semibold rounded hover:bg-green-600 transition duration-300"
+                >
+                  View
+                </button>
+                <button
+                  onClick={() => router.push(`/relationship/edit/${relationship.id}`)}
+                  className="px-3 py-1 bg-yellow-500 text-white font-semibold rounded hover:bg-yellow-600 transition duration-300"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => handleDelete(relationship.id)}
+                  className="px-3 py-1 bg-red-500 text-white font-semibold rounded hover:bg-red-600 transition duration-300"
+                >
+                  Delete
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };

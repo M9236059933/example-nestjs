@@ -1,5 +1,5 @@
 import { useState, FormEvent } from "react";
-import axios from "axios";
+import axiosInstance from "../../utils/axios";
 import { useRouter } from "next/router";
 import withAuth from "../../hoc/withAuth";
 
@@ -13,19 +13,22 @@ const CreateWorld: React.FC = () => {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem('token');
+      // Get the user ID from the JWT token
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("No token found");
+      }
       
-      await axios.post("/api/world", {
+      const decoded = JSON.parse(atob(token.split(".")[1]));
+      const userId = decoded.sub;
+
+      await axiosInstance.post(`/world/${userId}`, {
         name,
         description,
-      }, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
       });
-      router.push("/dashboard");
+      router.push("/world");
     } catch (error) {
-      console.error("Failed to create World:", error);
+      console.error("Failed to create world:", error);
     }
   };
 

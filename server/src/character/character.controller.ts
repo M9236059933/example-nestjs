@@ -6,11 +6,14 @@ import {
   Delete,
   Body,
   Param,
+  UseGuards,
 } from '@nestjs/common';
 import { CharacterService } from './character.service';
 import { Character } from './character.entity';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('character')
+@UseGuards(JwtAuthGuard)
 export class CharacterController {
   constructor(private readonly characterService: CharacterService) {}
 

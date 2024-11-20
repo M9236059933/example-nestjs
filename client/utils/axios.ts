@@ -1,9 +1,14 @@
-import axios from 'axios';
+import axios from "axios";
+
+// Create axios instance with base configuration
+const axiosInstance = axios.create({
+  baseURL: "http://localhost:3001", // Update this to match your NestJS server port
+});
 
 // Add a request interceptor
-axios.interceptors.request.use(
+axiosInstance.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -14,4 +19,19 @@ axios.interceptors.request.use(
   }
 );
 
-export default axios; 
+// Add a response interceptor to handle authentication errors
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Clear token and redirect to login page
+      localStorage.removeItem("token");
+      if (typeof window !== "undefined") {
+        window.location.href = "/auth";
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
+export default axiosInstance;

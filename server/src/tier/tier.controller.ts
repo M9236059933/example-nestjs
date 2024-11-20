@@ -7,13 +7,16 @@ import {
   Param,
   Body,
   NotFoundException,
+  UseGuards,
 } from '@nestjs/common';
 import { TierService } from './tier.service';
 import { CreateTierDto } from './create-tier.dto';
 import { UpdateTierDto } from './update-tier.dto';
 import { Tier } from './tier.entity';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('tier')
+@UseGuards(JwtAuthGuard)
 export class TierController {
   constructor(private readonly tierService: TierService) {}
 

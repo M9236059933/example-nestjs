@@ -35,7 +35,7 @@ const Home: NextPage = () => {
       <div className="text-center mb-16">
         <Link
           href="/auth"
-          className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg text-xl transition-colors duration-200 transform hover:scale-105"
+          className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg text-xl transition-colors duration-200 transform hover:scale-105 btn"
         >
           Get Started
         </Link>

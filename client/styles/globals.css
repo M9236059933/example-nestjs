@@ -19,10 +19,26 @@
   }
 }
 
+* {
+  font-family: var(--font-sofia-sans), serif;
+}
+
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sofia-sans), system-ui, sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6,
+.gothic-text {
+  font-family: var(--font-grenze-gotisch), serif;
+}
+
+/* Apply gothic font to buttons */
+button,
+.btn {
+  font-family: var(--font-grenze-gotisch), serif;
+  letter-spacing: 0.02em; /* Slightly increase letter spacing for better readability */
 }
 
 @layer utilities {

@@ -28,6 +28,7 @@ interface Character {
     username: string;
     email: string;
   };
+  avatar: string | null;
 }
 
 const CharacterView: React.FC = () => {
@@ -81,13 +82,24 @@ const CharacterView: React.FC = () => {
 
   return (
     <div className="max-w-2xl mx-auto p-8 bg-white shadow-lg rounded-lg">
+      {character.avatar && (
+        <div className="flex justify-center mb-8">
+          <div className="w-48 h-48 rounded-full overflow-hidden ring-4 ring-blue-500 shadow-lg">
+            <img 
+              src={character.avatar} 
+              alt={`${character.name}'s avatar`} 
+              className="w-full h-full object-cover"
+            />
+          </div>
+        </div>
+      )}
+
       <h1 className="text-3xl font-bold mb-6">{character.name}</h1>
       <div className="space-y-4">
-        {character.nickname && (
-          <p className="text-gray-600">
-            <span className="font-semibold">Nickname:</span> {character.nickname}
-          </p>
-        )}
+        <p className="text-gray-600">
+          <span className="font-semibold">Nickname:</span>{" "}
+          {character.nickname || "N/A"}
+        </p>
         <p className="text-gray-600">
           <span className="font-semibold">Type:</span> {character.type?.desc || "N/A"}
         </p>

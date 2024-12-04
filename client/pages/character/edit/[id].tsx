@@ -59,6 +59,7 @@ interface Character {
     username: string;
     email: string;
   };
+  avatar: string;
 }
 
 const EditCharacter: React.FC = () => {
@@ -81,6 +82,7 @@ const EditCharacter: React.FC = () => {
   const [height, setHeight] = useState("");
   const [appearance, setAppearance] = useState("");
   const [visibility, setVisibility] = useState<number | null>(null);
+  const [avatar, setAvatar] = useState("");
 
   // Lists for dropdowns
   const [worldList, setWorldList] = useState<World[]>([]);
@@ -147,6 +149,7 @@ const EditCharacter: React.FC = () => {
           setHeight(characterData.height || "");
           setAppearance(characterData.appearance || "");
           setVisibility(characterData.visibility?.id || null);
+          setAvatar(characterData.avatar || "");
 
           setWorldList(worldsRes.data);
           setCharTypeList(charTypesRes.data);
@@ -192,6 +195,7 @@ const EditCharacter: React.FC = () => {
         height,
         appearance,
         visibility,
+        avatar,
       });
       router.push("/dashboard");
     } catch (error) {
@@ -209,7 +213,7 @@ const EditCharacter: React.FC = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-8">
+    <div className="max-w-2xl mx-auto p-8 bg-white shadow-lg rounded-lg">
       <h1 className="text-3xl font-bold mb-6">Edit Character</h1>
       
       <div className="mb-4">
@@ -220,6 +224,27 @@ const EditCharacter: React.FC = () => {
       </div>
       
       <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Avatar URL
+          </label>
+          <input
+            type="text"
+            value={avatar}
+            onChange={(e) => setAvatar(e.target.value)}
+            className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+            placeholder="Enter avatar URL"
+          />
+          {avatar && (
+            <div className="mt-2">
+              <img
+                src={avatar}
+                alt="Avatar preview"
+                className="w-24 h-24 object-cover rounded-lg"
+              />
+            </div>
+          )}
+        </div>
         {/* Name */}
         <input
           type="text"

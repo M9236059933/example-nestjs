@@ -71,4 +71,7 @@ export class Character {
 
   @ManyToOne(() => User, { nullable: true })
   createdBy: User;
+
+  @Column({ length: 500, nullable: true })
+  avatar: string;
 }

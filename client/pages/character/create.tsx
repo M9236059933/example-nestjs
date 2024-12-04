@@ -52,6 +52,7 @@ const CreateCharacter: React.FC = () => {
   const [height, setHeight] = useState("");
   const [appearance, setAppearance] = useState("");
   const [visibility, setVisibility] = useState<number | null>(null);
+  const [avatar, setAvatar] = useState("");
 
   // Lists for dropdowns
   const [worldList, setWorldList] = useState<World[]>([]);
@@ -119,6 +120,7 @@ const CreateCharacter: React.FC = () => {
         height,
         appearance,
         visibility,
+        avatar,
       });
       router.push("/dashboard");
     } catch (error) {
@@ -130,6 +132,27 @@ const CreateCharacter: React.FC = () => {
     <div className="max-w-xl mx-auto p-8 bg-white shadow-md rounded">
       <h1 className="text-2xl font-bold mb-6">Create Character</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Avatar URL
+          </label>
+          <input
+            type="text"
+            value={avatar}
+            onChange={(e) => setAvatar(e.target.value)}
+            className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+            placeholder="Enter avatar URL"
+          />
+          {avatar && (
+            <div className="mt-2">
+              <img
+                src={avatar}
+                alt="Avatar preview"
+                className="w-24 h-24 object-cover rounded-lg"
+              />
+            </div>
+          )}
+        </div>
         {/* Name */}
         <input
           type="text"

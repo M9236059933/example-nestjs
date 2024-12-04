@@ -12,6 +12,11 @@
     --background: #0a0a0a;
     --foreground: #ededed;
   }
+
+  /* Background overlay for dark mode */
+  .min-h-screen {
+    background-color: rgba(10, 10, 10, 0.5) !important;
+  }
 }
 
 body {

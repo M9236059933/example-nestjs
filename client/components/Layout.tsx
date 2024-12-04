@@ -8,7 +8,7 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const router = useRouter();
-  const isIndexPage = router.pathname === '/';
+  const isIndexPage = router.pathname === '/' || router.pathname === '/auth';
 
   return (
     <div 

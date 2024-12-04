@@ -14,8 +14,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     <div 
       className="min-h-screen bg-fixed bg-cover bg-center bg-no-repeat" 
       style={{ 
-        backgroundImage: 'url("/images/background.jpg")', 
-        backgroundColor: 'rgba(255, 255, 255, 0.9)'
+        backgroundImage: 'url("/images/background2.jpg")', 
+        backgroundColor: 'rgba(0, 0, 0, 0.7) !important', 
+        backgroundBlendMode: 'overlay'
       }}>
       <div className="min-h-screen">
         <header className={`${isIndexPage ? 'text-center py-8' : ''}`}>

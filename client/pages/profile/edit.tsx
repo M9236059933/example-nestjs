@@ -1,17 +1,20 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
+import Image from 'next/image';
 import axiosInstance from "../../utils/axios";
 import withAuth from "../../hoc/withAuth";
 
 const EditProfilePage: React.FC = () => {
   const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     email: "",
     username: "",
-    icon: "",
+    avatar: "",
   });
+  const [previewUrl, setPreviewUrl] = useState<string>("");
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -20,8 +23,9 @@ const EditProfilePage: React.FC = () => {
         setFormData({
           email: response.data.email || "",
           username: response.data.username || "",
-          icon: response.data.icon || "",
+          avatar: response.data.avatar || "",
         });
+        setPreviewUrl(response.data.avatar || "");
       } catch (error) {
         console.error("Failed to fetch profile:", error);
         setError("Failed to load profile data");
@@ -32,6 +36,37 @@ const EditProfilePage: React.FC = () => {
 
     fetchProfile();
   }, []);
+
+  const handleAvatarClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) { // 5MB limit
+      setError("File size too large. Please choose an image under 5MB.");
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append('avatar', file);
+
+      const response = await axiosInstance.post('/users/me/avatar', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      setPreviewUrl(URL.createObjectURL(file));
+      setFormData(prev => ({ ...prev, avatar: response.data.avatar }));
+    } catch (error) {
+      console.error('Failed to upload avatar:', error);
+      setError('Failed to upload avatar');
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,6 +108,31 @@ const EditProfilePage: React.FC = () => {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="flex justify-center mb-6">
+          <div 
+            className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-blue-500 cursor-pointer"
+            onClick={handleAvatarClick}
+          >
+            <Image
+              src={previewUrl || '/images/default-avatar.png'}
+              alt="Profile Avatar"
+              fill
+              className="object-cover"
+              sizes="128px"
+            />
+            <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+              <span className="text-white text-sm">Change Avatar</span>
+            </div>
+          </div>
+          <input
+            type="file"
+            ref={fileInputRef}
+            className="hidden"
+            accept="image/*"
+            onChange={handleFileChange}
+          />
+        </div>
+
         <div>
           <label
             htmlFor="email"
@@ -102,23 +162,6 @@ const EditProfilePage: React.FC = () => {
             id="username"
             name="username"
             value={formData.username}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        <div>
-          <label
-            htmlFor="icon"
-            className="block text-sm font-medium text-gray-700 mb-2"
-          >
-            Icon URL
-          </label>
-          <input
-            type="text"
-            id="icon"
-            name="icon"
-            value={formData.icon}
             onChange={handleChange}
             className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />

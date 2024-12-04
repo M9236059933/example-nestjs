@@ -26,7 +26,7 @@ const Dashboard: React.FC = () => {
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("activeTab");
-    router.push("/auth");
+    router.push("/");
   };
 
   const renderContent = () => {

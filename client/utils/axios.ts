@@ -27,7 +27,7 @@ axiosInstance.interceptors.response.use(
       // Clear token and redirect to login page
       localStorage.removeItem("token");
       if (typeof window !== "undefined") {
-        window.location.href = "/auth";
+        window.location.href = "/";
       }
     }
     return Promise.reject(error);

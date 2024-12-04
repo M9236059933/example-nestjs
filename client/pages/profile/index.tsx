@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
+import Image from 'next/image';
 import axiosInstance from "../../utils/axios";
 import withAuth from "../../hoc/withAuth";
 
@@ -8,6 +9,7 @@ interface Profile {
   email: string;
   createdAt: string;
   updatedAt: string;
+  avatar?: string;
 }
 
 const ProfilePage: React.FC = () => {
@@ -35,7 +37,7 @@ const ProfilePage: React.FC = () => {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <div className="text-xl text-gray-600">Loading...</div>
+        <div className="text-xl text-gray-200">Loading...</div>
       </div>
     );
   }
@@ -43,35 +45,50 @@ const ProfilePage: React.FC = () => {
   if (error) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <div className="text-xl text-red-600">{error}</div>
+        <div className="text-xl text-red-400">{error}</div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-2xl mx-auto p-8 bg-white shadow-lg rounded-lg">
-      <h1 className="text-3xl font-bold mb-6 text-blue-600">Profile</h1>
+    <div className="max-w-2xl mx-auto p-8 bg-gray-800 shadow-xl rounded-lg border border-gray-700">
+      <h1 className="text-3xl font-bold mb-6 text-blue-400">Profile</h1>
 
       {profile && (
-        <div className="space-y-4">
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <p className="text-gray-600">
-              <span className="font-semibold">Email:</span> {profile.email}
-            </p>
+        <div className="space-y-6">
+          <div className="flex justify-center">
+            <div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-blue-500 shadow-lg">
+              <Image
+                src={profile.avatar || '/images/default-avatar.png'}
+                alt="Profile Avatar"
+                fill
+                className="object-cover"
+                sizes="128px"
+              />
+            </div>
           </div>
 
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <p className="text-gray-600">
-              <span className="font-semibold">Member since:</span>{" "}
-              {new Date(profile.createdAt).toLocaleDateString()}
-            </p>
-          </div>
+          <div className="space-y-4">
+            <div className="bg-gray-700 p-4 rounded-lg border border-gray-600 hover:bg-gray-600 transition-colors">
+              <p className="text-gray-200">
+                <span className="font-semibold text-blue-400">Email:</span>{" "}
+                {profile.email}
+              </p>
+            </div>
 
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <p className="text-gray-600">
-              <span className="font-semibold">Last updated:</span>{" "}
-              {new Date(profile.updatedAt).toLocaleDateString()}
-            </p>
+            <div className="bg-gray-700 p-4 rounded-lg border border-gray-600 hover:bg-gray-600 transition-colors">
+              <p className="text-gray-200">
+                <span className="font-semibold text-blue-400">Member since:</span>{" "}
+                {new Date(profile.createdAt).toLocaleDateString()}
+              </p>
+            </div>
+
+            <div className="bg-gray-700 p-4 rounded-lg border border-gray-600 hover:bg-gray-600 transition-colors">
+              <p className="text-gray-200">
+                <span className="font-semibold text-blue-400">Last updated:</span>{" "}
+                {new Date(profile.updatedAt).toLocaleDateString()}
+              </p>
+            </div>
           </div>
         </div>
       )}
@@ -79,21 +96,21 @@ const ProfilePage: React.FC = () => {
       <div className="mt-8 space-y-4">
         <button
           onClick={() => router.push("/profile/edit")}
-          className="w-full bg-blue-500 text-white font-bold py-2 rounded shadow-md transition duration-300 hover:bg-blue-600 focus:ring-2 focus:ring-blue-300"
+          className="w-full bg-blue-600 text-white font-bold py-2 rounded shadow-md transition duration-300 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800"
         >
           Edit Profile
         </button>
 
         <button
           onClick={() => router.push("/profile/change-password")}
-          className="w-full bg-green-500 text-white font-bold py-2 rounded shadow-md transition duration-300 hover:bg-green-600 focus:ring-2 focus:ring-green-300"
+          className="w-full bg-green-600 text-white font-bold py-2 rounded shadow-md transition duration-300 hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-800"
         >
           Change Password
         </button>
 
         <button
           onClick={() => router.push("/dashboard")}
-          className="w-full bg-gray-500 text-white font-bold py-2 rounded shadow-md transition duration-300 hover:bg-gray-600 focus:ring-2 focus:ring-gray-300"
+          className="w-full bg-gray-600 text-white font-bold py-2 rounded shadow-md transition duration-300 hover:bg-gray-700 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-800"
         >
           Back to Dashboard
         </button>

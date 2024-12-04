@@ -83,19 +83,21 @@ const TierPage: React.FC = () => {
               <td className="border border-gray-300 p-3">
                 {tier.npc?.name || "N/A"}
               </td>
-              <td className="border border-gray-300 p-3 space-x-2">
-                <button
-                  onClick={() => router.push(`/tier/edit/${tier.id}`)}
-                  className="px-3 py-1 bg-yellow-500 text-white font-semibold rounded hover:bg-yellow-600 transition duration-300"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => handleDelete(tier.id)}
-                  className="px-3 py-1 bg-red-500 text-white font-semibold rounded hover:bg-red-600 transition duration-300"
-                >
-                  Delete
-                </button>
+              <td className="border border-gray-300 p-3">
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={() => router.push(`/tier/edit/${tier.id}`)}
+                    className="px-3 py-1 bg-yellow-500 text-white font-semibold rounded hover:bg-yellow-600 transition duration-300"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete(tier.id)}
+                    className="px-3 py-1 bg-red-500 text-white font-semibold rounded hover:bg-red-600 transition duration-300"
+                  >
+                    Delete
+                  </button>
+                </div>
               </td>
             </tr>
           ))}

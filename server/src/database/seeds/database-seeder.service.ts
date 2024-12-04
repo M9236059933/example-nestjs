@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { Character } from '../../character/character.entity';
+import { characterSeed } from './character.seed';
 import { CharType } from '../../char-type/char-type.entity';
 import { Classes } from '../../classes/classes.entity';
 import { Gender } from '../../gender/gender.entity';
@@ -10,6 +12,8 @@ import { Visibility } from '../../visibility/visibility.entity';
 @Injectable()
 export class DatabaseSeederService {
   constructor(
+    @InjectRepository(Character)
+    private characterRepository: Repository<Character>,
     @InjectRepository(CharType)
     private charTypeRepository: Repository<CharType>,
     @InjectRepository(Classes)
@@ -29,6 +33,7 @@ export class DatabaseSeederService {
     await this.seedGenders();
     await this.seedSpecies();
     await this.seedVisibilities();
+    await this.seedCharacters();
   }
 
   private async seedCharTypes() {
@@ -51,6 +56,23 @@ export class DatabaseSeederService {
       console.log('Character types seeded successfully');
     } else {
       console.log('CharTypes already exist. Skipping seeding.');
+    }
+  }
+
+  private async seedCharacters() {
+    const existingCharacters = await this.characterRepository.find();
+
+    if (existingCharacters.length === 0) {
+      console.log('Seeding characters...');
+
+      for (const characterData of characterSeed) {
+        const character = this.characterRepository.create(characterData);
+        await this.characterRepository.save(character);
+      }
+
+      console.log('Characters seeded successfully');
+    } else {
+      console.log('Characters table already has data, skipping seed');
     }
   }
 
@@ -173,4 +195,4 @@ export class DatabaseSeederService {
       console.log('Visibilities already exist. Skipping seeding.');
     }
   }
-} 
+}

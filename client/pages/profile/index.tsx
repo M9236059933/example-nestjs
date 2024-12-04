@@ -59,7 +59,7 @@ const ProfilePage: React.FC = () => {
           <div className="flex justify-center">
             <div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-blue-500 shadow-lg">
               <Image
-                src={profile.avatar || '/images/default-avatar.png'}
+                src={profile.email === 'mark@test.com' ? '/images/default-avatar_m.png' : '/images/default-avatar.png'}
                 alt="Profile Avatar"
                 fill
                 className="object-cover"

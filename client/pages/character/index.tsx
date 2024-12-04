@@ -77,7 +77,7 @@ const CharacterPage: React.FC = () => {
         <table className="w-full border-collapse">
           <thead>
             <tr className="bg-gray-200 text-gray-700">
-              <th className="border border-gray-300 p-3 w-12" aria-label="View Details"></th>
+              <th className="border border-gray-300 p-3 w-12"></th>
               <th className="border border-gray-300 p-3">Avatar</th>
               <th className="border border-gray-300 p-3 text-left">ID</th>
               <th className="border border-gray-300 p-3 text-left">Name</th>

@@ -14,6 +14,7 @@ import { CharacterService } from './character.service';
 import { Character } from './character.entity';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { User } from '../user/user.entity';
+import { CharacterGeneratorService } from './character-generator/character-generator.service';
 
 interface RequestWithUser extends Request {
   user: {
@@ -25,7 +26,10 @@ interface RequestWithUser extends Request {
 @Controller('character')
 @UseGuards(JwtAuthGuard)
 export class CharacterController {
-  constructor(private readonly characterService: CharacterService) {}
+  constructor(
+    private readonly characterService: CharacterService,
+    private readonly characterGeneratorService: CharacterGeneratorService,
+  ) {}
 
   @Post()
   create(
@@ -61,5 +65,14 @@ export class CharacterController {
     @Request() req: RequestWithUser,
   ): Promise<void> {
     return this.characterService.delete(id, req.user.userId);
+  }
+
+  @Post('generate')
+  async generateCharacter(
+    @Body() generatorData: any,
+    @Request() req: RequestWithUser,
+  ): Promise<Character> {
+    this.characterGeneratorService.setGeneratorData(generatorData);
+    return this.characterGeneratorService.generateCharacter(req.user.userId);
   }
 }
